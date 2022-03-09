@@ -2,7 +2,7 @@
 
 # ApeSwap Swap V2 Monorep
 [![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-yellow)](https://apeswap.gitbook.io/apeswap-finance/welcome/master)
-[![CI Status](https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo/workflows/CI/badge.svg)](https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo/actions)
+[![CI Status](https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo/actions/workflows/ci.yml/badge.svg)](https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 This repository contains the code for the ApeSwap DEX V2. This project is a fork of [balancer-v2-monorepo](https://github.com/balancer-labs/balancer-v2-monorepo). For more further information please see their detailed [documentation](https://docs.balancer.fi/) as we build out ours.
