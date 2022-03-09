@@ -7,6 +7,23 @@
 
 This repository contains the code for the ApeSwap DEX V2. This project is a fork of [balancer-v2-monorepo](https://github.com/balancer-labs/balancer-v2-monorepo). For more further information please see their detailed [documentation](https://docs.balancer.fi/) as we build out ours.
 
+## Pulling Upstream Changes
+Balancer V2 Monorepo is an actively maintained repository. The unaltered Balancer V2 code lives in the [balancer-v2](https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo/tree/balancer-v2) branch. To pull in new updates to that branch run the following: 
+
+```bash
+git checkout balancer-v2
+git fetch upstream
+git merge upstream/master
+```
+
+Now the new updates will be in the [balancer-v2](https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo/tree/balancer-v2) branch. These updates can then be merged into a feature branch off of `main` reconcile the updates.  
+
+```
+git checkout main
+git checkout -b feature/<feature-name>
+git merge balancer-v2
+```
+
 ## Balancer Info
 This repository contains the Balancer Protocol V2 core smart contracts, including the `Vault` and standard Pools, along with their tests, configuration, and deployment information.
 
