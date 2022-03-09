@@ -1,11 +1,13 @@
-# <img src="logo.svg" alt="Balancer" height="128px">
+# <img src="logo.svg" alt="ApeSwap" height="160px">
 
-# Balancer V2 Monorepo
-
-[![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-blue)](https://docs.balancer.fi/)
-[![CI Status](https://github.com/balancer-labs/balancer-v2-monorepo/workflows/CI/badge.svg)](https://github.com/balancer-labs/balancer-v2-monorepo/actions)
+# ApeSwap Swap V2 Monorep
+[![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-yellow)](https://apeswap.gitbook.io/apeswap-finance/welcome/master)
+[![CI Status](https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo/workflows/CI/badge.svg)](https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo/actions)
 [![License](https://img.shields.io/badge/License-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
+This repository contains the code for the ApeSwap DEX V2. This project is a fork of [balancer-v2-monorepo](https://github.com/balancer-labs/balancer-v2-monorepo). For more further information please see their detailed [documentation](https://docs.balancer.fi/) as we build out ours.
+
+## Balancer Info
 This repository contains the Balancer Protocol V2 core smart contracts, including the `Vault` and standard Pools, along with their tests, configuration, and deployment information.
 
 For a high-level introduction to Balancer V2, see [Introducing Balancer V2: Generalized AMMs](https://medium.com/balancer-protocol/balancer-v2-generalizing-amms-16343c4563ff).
@@ -17,8 +19,8 @@ This is a Yarn 2 monorepo, with the packages meant to be published in the [`pkg`
 Active development occurs in this repository, which means some contracts in it might not be production-ready. Proceed with caution.
 
 ### Packages
-
-- [`v2-deployments`](./pkg/deployments): addresses and ABIs of all Balancer V2 deployed contracts, for mainnet and various test networks.
+<!-- FIXME: Update info for ApeSwap Deployments -->
+<!-- - [`v2-deployments`](./pkg/deployments): addresses and ABIs of all Balancer V2 deployed contracts, for mainnet and various test networks. -->
 - [`v2-vault`](./pkg/vault): the [`Vault`](./pkg/vault/contracts/Vault.sol) contract and all core interfaces, including [`IVault`](./pkg/vault/contracts/interfaces/IVault.sol) and the Pool interfaces: [`IBasePool`](./pkg/vault/contracts/interfaces/IBasePool.sol), [`IGeneralPool`](./pkg/vault/contracts/interfaces/IGeneralPool.sol) and [`IMinimalSwapInfoPool`](./pkg/vault/contracts/interfaces/IMinimalSwapInfoPool.sol).
 - [`v2-pool-weighted`](./pkg/pool-weighted): the [`WeightedPool`](./pkg/pool-weighted/contracts/WeightedPool.sol) and [`WeightedPool2Tokens`](./pkg/pool-weighted/contracts/WeightedPool2Tokens.sol) contracts, along with their associated factories.
 - [`v2-pool-utils`](./pkg/pool-utils): Solidity utilities used to develop Pool contracts.
