@@ -49,6 +49,11 @@ task(TASK_TEST)
   .setAction(test);
 
 export default {
+  networks: {
+    dev: {
+      url: 'http://127.0.0.1:8545',
+    },
+  },
   mocha: {
     timeout: 40000,
   },

@@ -32,7 +32,7 @@ export default class Task {
   _outputFile?: string;
 
   static fromHRE(id: string, hre: HardhatRuntimeEnvironment, verifier?: Verifier): Task {
-    return new this(id, hre.network.name, verifier);
+    return new this(id, hre.network.name as Network, verifier);
   }
 
   static forTest(id: string, network: Network, outputTestFile = 'test'): Task {
@@ -56,7 +56,7 @@ export default class Task {
     this._outputFile = file;
   }
 
-  get network(): string {
+  get network(): Network {
     if (!this._network) throw Error('A network must be specified to define a task');
     return this._network;
   }
