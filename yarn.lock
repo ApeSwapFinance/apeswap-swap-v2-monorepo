@@ -5,14 +5,6 @@ __metadata:
   version: 4
   cacheKey: 7
 
-"@apeswap.finance/ethers-utils@workspace:pkg-apeswap/ethers-utils":
-  version: 0.0.0-use.local
-  resolution: "@apeswap.finance/ethers-utils@workspace:pkg-apeswap/ethers-utils"
-  dependencies:
-    ethers: ^5.6.0
-  languageName: unknown
-  linkType: soft
-
 "@apeswapfinance/apeswap-swap-v2-monorepo@workspace:.":
   version: 0.0.0-use.local
   resolution: "@apeswapfinance/apeswap-swap-v2-monorepo@workspace:."
