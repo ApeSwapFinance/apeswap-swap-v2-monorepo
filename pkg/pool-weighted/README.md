@@ -1,4 +1,4 @@
-# <img src="../../logo.svg" alt="Balancer" height="128px">
+# <img src="../../logo.svg" alt="ApeSwap" height="128px"> <img src="../../logo-b.svg" alt="Balancer" height="64px">
 
 # Balancer V2 Weighted Pools
 
@@ -11,7 +11,7 @@ The two basic flavors currently in existence are [`WeightedPool`](./contracts/We
 The [`smart`](./contracts/smart) directory contains a number of 'smart' variants, which automatically update some of their attributes to support more complex use cases. Examples are [`LiquidityBootstrappingPool`](./contracts/smart/LiquidityBootstrappingPool.sol) for auction-like mechanisms, and [`ManagedPool`](./contracts/smart/ManagedPool.sol) for managed portfolios.
 
 | :warning: | Managed Pools are still undergoing development and may contain bugs and/or change significantly. |
-| --------- | :-------------------------------------------------------------------------------------------------- |
+| --------- | :----------------------------------------------------------------------------------------------- |
 
 Other useful contracts include [`WeightedMath`](./contracts/WeightedMath.sol), which implements the low level calculations required for swaps, joins, exits and price calculations, and [`IPriceOracle`](../pool-utils/contracts/interfaces/IPriceOracle.sol), used to make price oracle queries.
 

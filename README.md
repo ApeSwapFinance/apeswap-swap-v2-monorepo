@@ -1,4 +1,6 @@
-# <img src="logo.svg" alt="ApeSwap" height="160px">
+# <img src="logo.svg" alt="ApeSwap" height="160px"> <img src="logo-b.svg" alt="Balancer" height="64px"> 
+
+
 
 # ApeSwap Swap V2 Monorepo
 [![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-yellow)](https://apeswap.gitbook.io/apeswap-finance/welcome/master)
