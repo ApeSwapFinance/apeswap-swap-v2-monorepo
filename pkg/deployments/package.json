@@ -1,16 +1,16 @@
 {
-  "name": "@balancer-labs/v2-deployments",
+  "name": "@ape.swap/v2-deployments",
   "version": "2.3.0",
-  "description": "Addresses and ABIs of all Balancer V2 deployed contracts",
+  "description": "Addresses and ABIs of all ApeSwap Balancer V2 deployed contracts",
   "license": "GPL-3.0-only",
-  "homepage": "https://github.com/balancer-labs/balancer-v2-monorepo/tree/master/pkg/deployments#readme",
+  "homepage": "https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo/tree/master/pkg/deployments#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/balancer-labs/balancer-v2-monorepo.git",
+    "url": "https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo.git",
     "directory": "pkg/deployments"
   },
   "bugs": {
-    "url": "https://github.com/balancer-labs/balancer-v2-monorepo/issues"
+    "url": "https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo/issues"
   },
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
