@@ -13,6 +13,7 @@ export const NETWORKS = <const>[
   'polygon',
   'arbitrum',
   'bsc',
+  'bsc-dummy',
   'bsc-testnet',
   'dev',
 ];
