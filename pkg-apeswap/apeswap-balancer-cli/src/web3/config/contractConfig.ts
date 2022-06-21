@@ -46,10 +46,10 @@ const networkConfigs: ContractConfigs = {
     defaultAdminAddress: '0x6c905b4108A87499CEd1E0498721F2B831c6Ab13', // General Admin BSC
     vaultAddress: '0x42B7888FFf938C54faeDF52485C8323c4Fc8C99B',
     balancerHelpersAddress: '0x3A94927bA5Da97623357c2FD2bd03b154703cD66',
-    weightedPoolFactoryAddress: '',
-    weightedPool2TokensFactory: '',
+    weightedPoolFactoryAddress: '0x72E07CEe8c7Bb212940F755E297bE60Afc426F9b',
+    weightedPool2TokensFactory: '0xe7C30cadBeb9D707F857eE8a1145688F7A5eDaBc',
     stablePoolFactoryAddress: '',
-    stablePhantomPoolFactory: '',
+    stablePhantomPoolFactory: '0x89947d74A0fE4b1f1327BFDEfD314b8B9Eb490FC',
     olaLinearPoolFactoryAddress: '0x720a656C9589ebfd6d638DcE4629DCE368042790',
   },
   'bsc-testnet': {

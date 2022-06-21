@@ -1,4 +1,5 @@
 import { Overrides } from 'ethers';
+import { getEnv } from './utils';
 
 /**
  * Configure network types here
@@ -39,18 +40,22 @@ type NetworkConfigs = Record<NETWORK_TYPE, NetworkConfig>;
  */
 const networkConfigs: NetworkConfigs = {
   bsc: {
-    rpcUrl: 'https://bscrpc.com',
+    rpcUrl: getEnv('BSC_RPC') || 'https://bscrpc.com',
     getBlockExplorerUrl: (address: string) => `https://bscscan.com/address/${address}`,
     networkCategory: 'mainnet',
     txOverrides: {
       // gasLimit: 1e6,
-      // gasPrice: 5e9, // 5 Gwei
+      gasPrice: 5e9, // 5 Gwei
     },
   },
   'bsc-dummy': {
-    rpcUrl: 'https://bscrpc.com',
+    rpcUrl: getEnv('BSC_RPC') || 'https://bscrpc.com',
     getBlockExplorerUrl: (address: string) => `https://bscscan.com/address/${address}`,
     networkCategory: 'mainnet',
+    txOverrides: {
+      // gasLimit: 1e6,
+      gasPrice: 5e9, // 5 Gwei
+    },
   },
   'bsc-testnet': {
     rpcUrl: '',

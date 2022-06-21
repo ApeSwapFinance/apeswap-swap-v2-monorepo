@@ -1,13 +1,10 @@
 import { BigNumberish } from 'ethers';
 import { NETWORK_TYPE } from '../../config';
 
-type GasSpeed = 'slow' | 'average' | 'fast';
 export type PoolType = 'OlaLinearPool' | 'WeightedPool' | 'StablePhantomPool';
 
 export interface BasePoolConfig {
   network: NETWORK_TYPE;
-  gasSpeed: GasSpeed;
-  gasPriceOverride: BigNumberish;
   name: string;
   symbol: string;
   poolType: PoolType;
