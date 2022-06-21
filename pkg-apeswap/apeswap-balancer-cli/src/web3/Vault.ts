@@ -1,62 +1,119 @@
 import VaultABI from '@ape.swap/v2-deployments/tasks/20210418-vault/abi/Vault.json';
-import { BatchSwap } from '@balancer-labs/balancer-js';
 import { Vault as VaultType } from '@balancer-labs/typechain/dist/Vault';
-import { Contract, constants, Wallet, BigNumber, providers } from 'ethers';
-import { NETWORK_TYPE } from './config';
-import { getTxOverrides } from './provider';
+import BalancerHelpersABI from '@ape.swap/v2-deployments/tasks/20210418-vault/abi/BalancerHelpers.json';
+import { BalancerHelpers } from '@balancer-labs/typechain/dist/BalancerHelpers';
+import { BatchSwap, ExitPoolRequest, JoinPoolRequest } from '@balancer-labs/balancer-js';
+import { Contract, BigNumber, ContractReceipt } from 'ethers';
+import { getContractConfig, NETWORK_TYPE } from './config';
+import { getProvider, getWallet } from './provider';
 import { handleContractTx } from './txManager';
 
-interface VaultConfig {
-  network?: NETWORK_TYPE;
-  address?: string;
+// eslint-disable-next-line
+export async function queryJoin(
+  network: NETWORK_TYPE,
+  poolId: string,
+  sender: string,
+  recipient: string,
+  joinPoolRequest: JoinPoolRequest
+) {
+  const provider = getProvider(network);
+  const { balancerHelpersAddress } = getContractConfig(network);
+  const balancerHelpersContract = (new Contract(
+    balancerHelpersAddress,
+    BalancerHelpersABI,
+    provider
+  ) as unknown) as BalancerHelpers;
+  const queryReturn = await balancerHelpersContract.callStatic.queryJoin(poolId, sender, recipient, joinPoolRequest);
+  return queryReturn;
 }
 
-export default class Vault {
-  vaultContract: VaultType;
-  network: NETWORK_TYPE;
-  canSign = false;
+// eslint-disable-next-line
+export async function queryExit(
+  network: NETWORK_TYPE,
+  poolId: string,
+  sender: string,
+  recipient: string,
+  exitPoolRequest: ExitPoolRequest
+) {
+  const provider = getProvider(network);
+  const { balancerHelpersAddress } = getContractConfig(network);
+  const balancerHelpersContract = (new Contract(
+    balancerHelpersAddress,
+    BalancerHelpersABI,
+    provider
+  ) as unknown) as BalancerHelpers;
+  const queryReturn = await balancerHelpersContract.callStatic.queryExit(poolId, sender, recipient, exitPoolRequest);
+  return queryReturn;
+}
 
-  constructor(
-    signerOrProvider: Wallet | providers.JsonRpcProvider,
-    { network = 'bsc', address = constants.AddressZero }: VaultConfig
-  ) {
-    if (signerOrProvider instanceof Wallet) {
-      this.canSign = true;
+export async function queryBatchSwap(network: NETWORK_TYPE, batchSwap: BatchSwap): Promise<BigNumber[]> {
+  const provider = getProvider(network);
+  const { vaultAddress } = getContractConfig(network);
+  const vaultContract = (new Contract(vaultAddress, VaultABI, provider) as unknown) as VaultType;
+  const queryReturn = await vaultContract.callStatic.queryBatchSwap(
+    batchSwap.kind,
+    batchSwap.swaps,
+    batchSwap.assets,
+    batchSwap.funds
+  );
+
+  return queryReturn;
+}
+
+export async function sendBatchSwap(network: NETWORK_TYPE, batchSwap: BatchSwap): Promise<ContractReceipt> {
+  const wallet = getWallet(network);
+  const { vaultAddress } = getContractConfig(network);
+  const vaultContract = (new Contract(vaultAddress, VaultABI, wallet) as unknown) as VaultType;
+
+  const contractReceipt = await handleContractTx(
+    vaultContract.batchSwap,
+    [batchSwap.kind, batchSwap.swaps, batchSwap.assets, batchSwap.funds, batchSwap.limits, batchSwap.deadline],
+    { network }
+  );
+
+  return contractReceipt;
+}
+
+export async function sendJoinPool(
+  network: NETWORK_TYPE,
+  poolId: string,
+  joinPoolRequest: JoinPoolRequest
+): Promise<ContractReceipt> {
+  const wallet = getWallet(network);
+  const accountAddress = wallet.address;
+
+  const { vaultAddress } = getContractConfig(network);
+  const vaultContract = (new Contract(vaultAddress, VaultABI, wallet) as unknown) as VaultType;
+
+  const contractReceipt = await handleContractTx(
+    vaultContract.joinPool,
+    [poolId, accountAddress, accountAddress, joinPoolRequest],
+    {
+      network,
     }
-    this.vaultContract = (new Contract(address, VaultABI, signerOrProvider) as unknown) as VaultType;
-    this.network = network;
-  }
+  );
 
-  canSignTxs(): void {
-    if (!this.canSign) {
-      throw new Error(`Vault:: Signer not provided when creating contract which only allows for read calls.`);
+  return contractReceipt;
+}
+
+export async function sendExitPool(
+  network: NETWORK_TYPE,
+  poolId: string,
+  exitPoolRequest: ExitPoolRequest
+): Promise<ContractReceipt> {
+  const wallet = getWallet(network);
+  const accountAddress = wallet.address;
+
+  const { vaultAddress } = getContractConfig(network);
+  const vaultContract = (new Contract(vaultAddress, VaultABI, wallet) as unknown) as VaultType;
+
+  const contractReceipt = await handleContractTx(
+    vaultContract.exitPool,
+    [poolId, accountAddress, accountAddress, exitPoolRequest],
+    {
+      network,
     }
-  }
+  );
 
-  //   TODO: Test
-  async sendBatchSwap(batchSwap: BatchSwap): Promise<void> {
-    this.canSignTxs();
-    await handleContractTx(
-      this.vaultContract.batchSwap.arguments(
-        batchSwap.kind,
-        batchSwap.swaps,
-        batchSwap.assets,
-        batchSwap.funds,
-        batchSwap.limits,
-        batchSwap.deadline,
-        getTxOverrides(this.network, {})
-      )
-    );
-  }
-
-  async queryBatchSwap(batchSwap: BatchSwap): Promise<BigNumber[]> {
-    const queryReturn = await this.vaultContract.callStatic.queryBatchSwap(
-      batchSwap.kind,
-      batchSwap.swaps,
-      batchSwap.assets,
-      batchSwap.funds
-    );
-
-    return queryReturn;
-  }
+  return contractReceipt;
 }

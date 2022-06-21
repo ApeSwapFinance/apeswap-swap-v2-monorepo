@@ -1,21 +1,10 @@
 import { constants, providers, Wallet, utils, BigNumberish } from 'ethers';
 import { Contract } from '@ethersproject/contracts';
-import OlaLinearPoolABI from '@ape.swap/v2-deployments/tasks/20220427-ola-linear-pool/abi/OlaLinearPool.json';
 import OlaLinearPoolFactoryABI from '@ape.swap/v2-deployments/tasks/20220427-ola-linear-pool/abi/OlaLinearPoolFactory.json';
-import { OlaLinearPool } from '@balancer-labs/typechain/dist/OlaLinearPool';
 import { OlaLinearPoolFactory as OlaLinearPoolFactoryContract } from '@balancer-labs/typechain/dist/OlaLinearPoolFactory';
-import { BatchSwap, SwapKind } from '@balancer-labs/balancer-js';
 import { OlaLinearPoolConfig } from './configs';
-import { getContractConfig, NETWORK_TYPE } from '../config';
+import { NETWORK_TYPE } from '../config';
 import { handleContractTx } from '../txManager';
-
-// TODO: Pool class?
-// function getOlaLinearPoolContract(
-//   address = constants.AddressZero,
-//   signerOrProvider: Wallet | providers.BaseProvider
-// ): OlaLinearPool {
-//   return (new Contract(address, OlaLinearPoolABI, signerOrProvider) as unknown) as OlaLinearPool;
-// }
 
 interface ContractConfig {
   network?: NETWORK_TYPE;
@@ -83,22 +72,19 @@ export default class OlaLinearPoolFactory {
    *
    * @param {OlaLinearPoolConfig} olaLinearPoolConfig
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  // eslint-disable-next-line
   async createPool(olaLinearPoolConfig: OlaLinearPoolConfig) {
+    const { name, symbol, upperTarget, swapFeePercent, owner } = olaLinearPoolConfig;
     const { mainToken, wrappedToken } = this.getTokensFromConfig(olaLinearPoolConfig);
 
     const { pauseWindowDuration, bufferPeriodDuration } = await this.factoryContract.getPauseConfiguration();
 
     const contractReceipt = await handleContractTx(
-      this.factoryContract.create(
-        olaLinearPoolConfig.name,
-        olaLinearPoolConfig.symbol,
-        mainToken,
-        wrappedToken,
-        olaLinearPoolConfig.upperTarget,
-        olaLinearPoolConfig.swapFeePercent,
-        olaLinearPoolConfig.owner
-      )
+      this.factoryContract.create,
+      // eslint-disable-next-line
+      // @ts-ignore
+      [name, symbol, mainToken, wrappedToken, upperTarget, swapFeePercent, owner],
+      { network: olaLinearPoolConfig.network }
     );
 
     const encodedArgs = await this.getPoolCreationArguments(
@@ -111,10 +97,10 @@ export default class OlaLinearPoolFactory {
      * Provided encoded constructor arguments for deployed pool verification
      * https://dev.balancer.fi/resources/deploy-pools-from-factory/verification
      */
-    // TODO: Pull out contract address from events and then poolId from the pool/event
     return { contractReceipt, encodedArgs };
   }
 
+  // TEST: getPoolCreationArguments: This function is finicky because of the pauseWindowDuration and bufferPeriodDuration
   async getPoolCreationArguments(
     olaLinearPoolConfig: OlaLinearPoolConfig,
     pauseWindowDuration: BigNumberish,
