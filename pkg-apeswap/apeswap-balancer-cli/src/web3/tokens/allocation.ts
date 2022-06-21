@@ -1,10 +1,11 @@
 import { BigNumber, constants } from 'ethers';
-import { BigNumberish, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import ERC20Build from '../ABI/ERC20.json';
 import { ERC20 } from '../ABI/types/ERC20';
-import { getContractConfig, getNetworkConfig } from '../config';
+import { getContractConfig } from '../config';
 import { BasePoolConfig } from '../pools/configs';
 import { getWallet } from '../provider';
+import { handleContractTx } from '../txManager';
 
 export async function hasSufficientERC20Balance(poolConfig: BasePoolConfig): Promise<void> {
   const provider = getWallet(poolConfig.network);
@@ -25,7 +26,7 @@ export async function hasSufficientERC20Balance(poolConfig: BasePoolConfig): Pro
 export async function approveERC20Transfers(poolConfig: BasePoolConfig): Promise<void> {
   const { vaultAddress } = getContractConfig(poolConfig.network);
   const wallet = getWallet(poolConfig.network);
-  const accountAddress = await wallet.getAddress();
+  const accountAddress = wallet.address;
 
   for (const token in poolConfig.tokens) {
     const tokenConfig = poolConfig.tokens[token];
@@ -37,7 +38,9 @@ export async function approveERC20Transfers(poolConfig: BasePoolConfig): Promise
       console.log(
         `Approving allowance for vault ${vaultAddress} for token ${token} amount ${amountToApprove.toString()}`
       );
-      await ERC20Contract.approve(vaultAddress, idealAllowance.sub(currentAllowance));
+      await handleContractTx(ERC20Contract.approve, [vaultAddress, idealAllowance.sub(currentAllowance)], {
+        network: poolConfig.network,
+      });
     }
   }
 }

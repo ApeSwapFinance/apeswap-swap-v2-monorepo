@@ -23,6 +23,11 @@ export function getWallet(network: NETWORK_TYPE = 'bsc'): Wallet {
   return new Wallet(getAccount(network), provider);
 }
 
+export function getWalletAddress(network: NETWORK_TYPE = 'bsc'): string {
+  const wallet = getWallet(network);
+  return wallet.address;
+}
+
 export function getTxOverrides(network: NETWORK_TYPE = 'bsc', overrides: Overrides): Overrides {
   const defaultOverrides = getNetworkConfig(network).txOverrides || {};
   return { ...defaultOverrides, ...overrides };

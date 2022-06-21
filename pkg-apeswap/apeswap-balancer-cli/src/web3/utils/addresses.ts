@@ -26,3 +26,9 @@ export function addressesAreSorted(addresses: string[]): boolean {
   const sortedAddresses = sortAddresses(addresses);
   return equals(sortedAddresses, addresses);
 }
+
+export function addressObjectIsSorted<T>(addressObject: { [key: string]: T }): boolean {
+  const addresses = Object.keys(addressObject);
+  const sortedAddresses = sortAddresses(addresses);
+  return equals(sortedAddresses, addresses);
+}
