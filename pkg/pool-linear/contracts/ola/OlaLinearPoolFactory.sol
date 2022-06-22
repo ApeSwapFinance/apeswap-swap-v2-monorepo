@@ -41,10 +41,10 @@ contract OlaLinearPoolFactory is BasePoolSplitCodeFactory, FactoryWidePauseWindo
         uint256 upperTarget,
         uint256 swapFeePercentage,
         address owner
-    ) external returns (LinearPool) {
+    ) external returns (LinearPoolV2) {
         (uint256 pauseWindowDuration, uint256 bufferPeriodDuration) = getPauseConfiguration();
 
-        LinearPool pool = OlaLinearPool(
+        LinearPoolV2 pool = OlaLinearPool(
             _create(
                 abi.encode(
                     getVault(),
