@@ -1,16 +1,16 @@
 {
-  "name": "@balancer-labs/v2-pool-linear",
-  "version": "0.1.0",
-  "description": "Balancer V2 Linear Pools",
+  "name": "@ape.swap/v2-pool-linear",
+  "version": "0.1.1",
+  "description": "ApeSwap V2 Linear Pools",
   "license": "GPL-3.0-only",
-  "homepage": "https://github.com/balancer-labs/balancer-v2-monorepo/tree/master/pkg/pool-linear#readme",
+  "homepage": "https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo/tree/main/pkg/pool-linear#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/balancer-labs/balancer-v2-monorepo.git",
+    "url": "https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo.git",
     "directory": "pkg/pool-linear"
   },
   "bugs": {
-    "url": "https://github.com/balancer-labs/balancer-v2-monorepo/issues"
+    "url": "https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo/issues"
   },
   "files": [
     "contracts/**/*",

@@ -15,7 +15,7 @@
 pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
-import "../LinearPool.sol";
+import "../LinearPoolV2.sol";
 
 interface IOTokenForOlaLinearPool {
     function underlying() external view returns (address);
@@ -23,13 +23,15 @@ interface IOTokenForOlaLinearPool {
     function decimals() external view returns (uint256);
 
     function exchangeRateStored() external view returns (uint256);
+
+    function accrueInterest() external returns (uint256);
 }
 
 /**
  * OlaLinearPoolFactory
  * Based on : https://etherscan.io/address/0x2BBf681cC4eb09218BEe85EA2a5d3D13Fa40fC0C#code
  */
-contract OlaLinearPool is LinearPool {
+contract OlaLinearPool is LinearPoolV2 {
     uint256 private immutable _exchangeRateScale;
     IOTokenForOlaLinearPool private _oToken;
 
@@ -45,7 +47,7 @@ contract OlaLinearPool is LinearPool {
         uint256 bufferPeriodDuration,
         address owner
     )
-        LinearPool(
+        LinearPoolV2(
             vault,
             name,
             symbol,
@@ -75,6 +77,20 @@ contract OlaLinearPool is LinearPool {
          */
         _exchangeRateScale = 18 + underlyingDecimals - oTokenDecimals;
         _oToken = oToken;
+    }
+
+    /**
+     * @dev Overriding onSwap from LinearPoolV2.
+     */
+    function onSwap(
+        SwapRequest memory request,
+        uint256[] memory balances,
+        uint256 indexIn,
+        uint256 indexOut
+    ) public override returns (uint256) {
+        // Ensure that the exchangeRateStored is updated when a swap happens to ensure that arbitrageurs can't siphon off unaccounted interest.
+        _oToken.accrueInterest();
+        super.onSwap(request, balances, indexIn, indexOut);
     }
 
     function _getWrappedTokenRate() internal view override returns (uint256) {
