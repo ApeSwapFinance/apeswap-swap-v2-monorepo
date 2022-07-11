@@ -11,7 +11,7 @@ import { deploy } from '@balancer-labs/v2-helpers/src/contract';
 import { MONTH } from '@balancer-labs/v2-helpers/src/time';
 import Vault from '@balancer-labs/v2-helpers/src/models/vault/Vault';
 import * as expectEvent from '@balancer-labs/v2-helpers/src/test/expectEvent';
-import { encodeInvestmentConfig } from '@balancer-labs/v2-asset-manager-utils/test/helpers/rebalance';
+import { encodeInvestmentConfig } from '@balancer-labs/v2-pool-utils/test/helpers/rebalance';
 import { ZERO_ADDRESS } from '@balancer-labs/v2-helpers/src/constants';
 import TypesConverter from '@balancer-labs/v2-helpers/src/models/types/TypesConverter';
 
@@ -44,7 +44,7 @@ sharedBeforeEach('deploy Vault, asset manager, and tokens', async () => {
   allTokens = await TokenList.create(['MKR', 'DAI', 'SNX', 'BAT'], { sorted: true });
   await allTokens.mint({ to: manager, amount: fp(100) });
 
-  assetManager = await deploy('v2-asset-manager-utils/MockAssetManager', { args: [allTokens.DAI.address] });
+  assetManager = await deploy('MockAssetManager', { args: [allTokens.DAI.address] });
 });
 
 async function deployControllerAndPool(canTransfer = true, canChangeSwapFee = true, canUpdateMetadata = true) {
@@ -213,7 +213,7 @@ describe('BasePoolController', function () {
 
       it('reverts if the manager transfers ownership', async () => {
         await expect(poolController.connect(manager).transferOwnership(other.address)).to.be.revertedWith(
-          'UNAUTHORIZED_OPERATION'
+          'FEATURE_DISABLED'
         );
       });
     });
@@ -281,7 +281,7 @@ describe('BasePoolController', function () {
 
       it('reverts if manager sets the swap fee', async () => {
         await expect(poolController.connect(manager).setSwapFeePercentage(NEW_SWAP_FEE)).to.be.revertedWith(
-          'UNAUTHORIZED_OPERATION'
+          'FEATURE_DISABLED'
         );
       });
     });
@@ -297,9 +297,7 @@ describe('BasePoolController', function () {
       });
 
       it('reverts if the manager updates metadata', async () => {
-        await expect(poolController.connect(manager).updateMetadata(METADATA)).to.be.revertedWith(
-          'UNAUTHORIZED_OPERATION'
-        );
+        await expect(poolController.connect(manager).updateMetadata(METADATA)).to.be.revertedWith('FEATURE_DISABLED');
       });
     });
   });

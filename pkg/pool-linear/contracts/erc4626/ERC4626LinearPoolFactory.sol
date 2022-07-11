@@ -15,7 +15,8 @@
 pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
-import "@balancer-labs/v2-vault/contracts/interfaces/IVault.sol";
+import "@balancer-labs/v2-interfaces/contracts/vault/IVault.sol";
+
 import "@balancer-labs/v2-pool-utils/contracts/factories/BasePoolSplitCodeFactory.sol";
 import "@balancer-labs/v2-pool-utils/contracts/factories/FactoryWidePauseWindow.sol";
 
@@ -33,7 +34,7 @@ contract ERC4626LinearPoolFactory is BasePoolSplitCodeFactory, FactoryWidePauseW
         string memory name,
         string memory symbol,
         IERC20 mainToken,
-        IERC20 wrappedToken,
+        IERC4626 wrappedToken,
         uint256 upperTarget,
         uint256 swapFeePercentage,
         address owner

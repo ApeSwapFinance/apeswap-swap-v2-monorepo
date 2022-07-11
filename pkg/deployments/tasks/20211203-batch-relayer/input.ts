@@ -1,11 +1,11 @@
-import Task from '../../src/task';
+import Task, { TaskMode } from '../../src/task';
 
 export type BatchRelayerDeployment = {
   Vault: string;
   wstETH: string;
 };
 
-const Vault = new Task('20210418-vault');
+const Vault = new Task('20210418-vault', TaskMode.READ_ONLY);
 
 export default {
   // wstETH is only deployed on mainnet and kovan
@@ -16,6 +16,10 @@ export default {
   kovan: {
     Vault,
     wstETH: '0xa387b91e393cfb9356a460370842bc8dbb2f29af',
+  },
+  goerli: {
+    Vault,
+    wstETH: '0x6320cD32aA674d2898A68ec82e869385Fc5f7E2f',
   },
   rinkeby: {
     Vault,

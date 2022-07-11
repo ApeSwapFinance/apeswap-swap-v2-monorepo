@@ -68,32 +68,36 @@ export async function deployPool(vault: Vault, tokens: TokenList, poolName: Pool
 
   const swapFeePercentage = fp(0.02); // 2%
   const managementFee = fp(0.5); // 50%
+  const aumFee = 0;
 
   let pool: Contract;
   let joinUserData: string;
 
-  if (poolName == 'WeightedPool' || poolName == 'OracleWeightedPool' || poolName == 'ManagedPool') {
+  if (poolName == 'WeightedPool' || poolName == 'ManagedPool') {
     const WEIGHTS = range(10000, 10000 + tokens.length);
     const weights = toNormalizedWeights(WEIGHTS.map(bn)); // Equal weights for all tokens
     const assetManagers = Array(weights.length).fill(ZERO_ADDRESS);
     let params;
 
+    const aumProtocolFeesCollector = await deploy('v2-standalone-utils/AumProtocolFeesCollector', {
+      args: [vault.address],
+    });
+
     switch (poolName) {
       case 'ManagedPool': {
         const newPoolParams: ManagedPoolParams = {
-          vault: vault.address,
           name: name,
           symbol: symbol,
           tokens: tokens.addresses,
           normalizedWeights: weights,
           assetManagers: Array(tokens.length).fill(ZERO_ADDRESS),
           swapFeePercentage: swapFeePercentage,
-          pauseWindowDuration: MONTH * 3,
-          bufferPeriodDuration: MONTH,
-          owner: creator.address,
           swapEnabledOnStart: true,
           mustAllowlistLPs: false,
+          protocolSwapFeePercentage: MAX_UINT256,
           managementSwapFeePercentage: managementFee,
+          managementAumFeePercentage: aumFee,
+          aumProtocolFeesCollector: aumProtocolFeesCollector.address,
         };
 
         const basePoolRights: BasePoolRights = {
@@ -108,13 +112,10 @@ export async function deployPool(vault: Vault, tokens: TokenList, poolName: Pool
           canSetMustAllowlistLPs: true,
           canSetCircuitBreakers: true,
           canChangeTokens: true,
-          canChangeMgmtSwapFee: true,
+          canChangeMgmtFees: true,
         };
-        params = [newPoolParams, basePoolRights, managedPoolRights, DAY];
-        break;
-      }
-      case 'OracleWeightedPool': {
-        params = [tokens.addresses, weights, swapFeePercentage, true];
+
+        params = [newPoolParams, basePoolRights, managedPoolRights, DAY, creator.address];
         break;
       }
       default: {
@@ -128,24 +129,28 @@ export async function deployPool(vault: Vault, tokens: TokenList, poolName: Pool
     });
 
     joinUserData = WeightedPoolEncoder.joinInit(tokens.map(() => initialPoolBalance));
-  } else if (poolName == 'StablePool') {
+  } else if (poolName == 'StablePhantomPool') {
     const amplificationParameter = bn(50);
+
+    const rateProviders = Array(tokens.length).fill(ZERO_ADDRESS);
+    const cacheDurations = Array(tokens.length).fill(0);
 
     pool = await deployPoolFromFactory(vault, poolName, {
       from: creator,
-      parameters: [tokens.addresses, amplificationParameter, swapFeePercentage],
+      parameters: [tokens.addresses, amplificationParameter, rateProviders, cacheDurations, swapFeePercentage],
     });
-
-    joinUserData = StablePoolEncoder.joinInit(tokens.map(() => initialPoolBalance));
   } else {
     throw new Error(`Unhandled pool: ${poolName}`);
   }
 
   const poolId = await pool.getPoolId();
+  const { tokens: allTokens } = await vault.getPoolTokens(poolId);
+  const initialBalances = allTokens.map((t) => (t == pool.address ? 0 : initialPoolBalance));
+  joinUserData = StablePoolEncoder.joinInit(initialBalances);
 
   await vault.instance.connect(creator).joinPool(poolId, creator.address, creator.address, {
-    assets: tokens.addresses,
-    maxAmountsIn: tokens.map(() => initialPoolBalance), // These end up being the actual join amounts
+    assets: allTokens,
+    maxAmountsIn: Array(allTokens.length).fill(MAX_UINT256), // These end up being the actual join amounts
     fromInternalBalance: false,
     userData: joinUserData,
   });
@@ -157,15 +162,13 @@ export async function deployPool(vault: Vault, tokens: TokenList, poolName: Pool
 }
 
 export async function getWeightedPool(vault: Vault, tokens: TokenList, size: number, offset = 0): Promise<string> {
-  return size === 2
-    ? deployPool(vault, tokens.subset(size, offset), 'OracleWeightedPool')
-    : size > 20
+  return size > 20
     ? deployPool(vault, tokens.subset(size, offset), 'ManagedPool')
     : deployPool(vault, tokens.subset(size, offset), 'WeightedPool');
 }
 
 export async function getStablePool(vault: Vault, tokens: TokenList, size: number, offset?: number): Promise<string> {
-  return deployPool(vault, tokens.subset(size, offset), 'StablePool');
+  return deployPool(vault, tokens.subset(size, offset), 'StablePhantomPool');
 }
 
 export function pickTokenAddresses(tokens: TokenList, size: number, offset?: number): string[] {
@@ -183,24 +186,20 @@ export async function getSigners(): Promise<{
   return { admin, creator, trader, others };
 }
 
-type PoolName = 'WeightedPool' | 'OracleWeightedPool' | 'StablePool' | 'ManagedPool';
+type PoolName = 'WeightedPool' | 'StablePhantomPool' | 'ManagedPool';
 
 async function deployPoolFromFactory(
   vault: Vault,
   poolName: PoolName,
   args: { from: SignerWithAddress; parameters: Array<unknown> }
 ): Promise<Contract> {
-  const fullName = `${poolName == 'StablePool' ? 'v2-pool-stable' : 'v2-pool-weighted'}/${poolName}`;
-  const libraries =
-    poolName == 'OracleWeightedPool'
-      ? { QueryProcessor: await (await deploy('v2-pool-utils/QueryProcessor')).address }
-      : undefined;
+  const fullName = `${poolName == 'StablePhantomPool' ? 'v2-pool-stable-phantom' : 'v2-pool-weighted'}/${poolName}`;
   let factory: Contract;
   if (poolName == 'ManagedPool') {
     const baseFactory = await deploy('v2-pool-weighted/BaseManagedPoolFactory', { args: [vault.address] });
     factory = await deploy(`${fullName}Factory`, { args: [baseFactory.address] });
   } else {
-    factory = await deploy(`${fullName}Factory`, { args: [vault.address], libraries });
+    factory = await deploy(`${fullName}Factory`, { args: [vault.address] });
   }
 
   // We could reuse this factory if we saved it across pool deployments
