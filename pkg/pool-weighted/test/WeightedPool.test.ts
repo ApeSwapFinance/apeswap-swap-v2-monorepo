@@ -6,7 +6,6 @@ import WeightedPool from '@balancer-labs/v2-helpers/src/models/pools/weighted/We
 import { WeightedPoolType } from '@balancer-labs/v2-helpers/src/models/pools/weighted/types';
 
 import { range } from 'lodash';
-import { itPaysProtocolFeesFromInvariantGrowth } from './InvariantGrowthProtocolFees.behavior';
 
 describe('WeightedPool', function () {
   let allTokens: TokenList;
@@ -19,8 +18,6 @@ describe('WeightedPool', function () {
   sharedBeforeEach('deploy tokens', async () => {
     allTokens = await TokenList.create(MAX_TOKENS, { sorted: true, varyDecimals: true });
   });
-
-  itPaysProtocolFeesFromInvariantGrowth();
 
   describe('weights and scaling factors', () => {
     for (const numTokens of range(2, MAX_TOKENS + 1)) {

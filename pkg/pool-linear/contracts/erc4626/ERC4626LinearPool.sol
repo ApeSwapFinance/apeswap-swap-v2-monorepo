@@ -15,24 +15,23 @@
 pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
-import "@balancer-labs/v2-interfaces/contracts/solidity-utils/misc/IERC4626.sol";
-
 import "@balancer-labs/v2-solidity-utils/contracts/openzeppelin/ERC20.sol";
 import "@balancer-labs/v2-solidity-utils/contracts/math/Math.sol";
+import "@balancer-labs/v2-solidity-utils/contracts/misc/IERC4626.sol";
 
 import "../LinearPool.sol";
 
 contract ERC4626LinearPool is LinearPool {
     using Math for uint256;
 
-    uint256 private immutable _rateScaleFactor;
+    uint256 private immutable _wrappedTokenRateScale;
 
     constructor(
         IVault vault,
         string memory name,
         string memory symbol,
         IERC20 mainToken,
-        IERC4626 wrappedToken,
+        IERC20 wrappedToken,
         uint256 upperTarget,
         uint256 swapFeePercentage,
         uint256 pauseWindowDuration,
@@ -68,26 +67,29 @@ contract ERC4626LinearPool is LinearPool {
         // whereas mainToken is DAI. But the 1:1 relationship holds, and
         // the pool is still valid.
 
-        // _getWrappedTokenRate is scaled e18, so we may need to scale IERC4626.convertToAssets()
+        // _getWrappedTokenRate is scaled e18, so we may need to scale totalAssets/totalSupply
         uint256 wrappedTokenDecimals = ERC20(address(wrappedToken)).decimals();
         uint256 mainTokenDecimals = ERC20(address(mainToken)).decimals();
-
-        // This is always positive because we only accept tokens with <= 18 decimals
         uint256 digitsDifference = Math.add(18, wrappedTokenDecimals).sub(mainTokenDecimals);
-        _rateScaleFactor = 10**digitsDifference;
+        _wrappedTokenRateScale = 10**digitsDifference;
     }
 
     function _getWrappedTokenRate() internal view override returns (uint256) {
-        IERC4626 wrappedToken = IERC4626(address(getWrappedToken()));
+        address wrappedToken = getWrappedToken();
 
-        // Main tokens per 1e18 wrapped token wei
-        //     decimals: main + (18 - wrapped)
-        uint256 assetsPerShare = wrappedToken.convertToAssets(FixedPoint.ONE);
+        // At _mainToken.decimals() precision, potentially may be ZERO
+        uint256 totalMain = IERC4626(wrappedToken).totalAssets();
+
+        // At _wrappedToken.decimals() precision, potentially may be ZERO
+        uint256 totalWrapped = ERC20(wrappedToken).totalSupply();
+
+        // On empty pool return 1:1 rate
+        if (totalMain == 0 || totalWrapped == 0) {
+            return FixedPoint.ONE;
+        }
 
         // This function returns a 18 decimal fixed point number
-        //     assetsPerShare decimals:   18 + main - wrapped
-        //     _rateScaleFactor decimals: 18 - main + wrapped
-        uint256 rate = assetsPerShare.mul(_rateScaleFactor).divDown(FixedPoint.ONE);
+        uint256 rate = _wrappedTokenRateScale.mul(totalMain).divDown(totalWrapped);
         return rate;
     }
 }

@@ -2,9 +2,9 @@
 
 pragma solidity ^0.7.0;
 
-import "@balancer-labs/v2-interfaces/contracts/solidity-utils/helpers/BalancerErrors.sol";
-import "@balancer-labs/v2-interfaces/contracts/solidity-utils/openzeppelin/IERC20.sol";
+import "../helpers/BalancerErrors.sol";
 
+import "./IERC20.sol";
 import "./SafeMath.sol";
 
 /**
@@ -322,7 +322,5 @@ contract ERC20 is IERC20 {
         address from,
         address to,
         uint256 amount
-    ) internal virtual {
-        // solhint-disable-previous-line no-empty-blocks
-    }
+    ) internal virtual {}
 }
