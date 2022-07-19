@@ -5,24 +5,18 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 import Token from '@balancer-labs/v2-helpers/src/models/tokens/Token';
 import TokenList from '@balancer-labs/v2-helpers/src/models/tokens/TokenList';
-import StablePhantomPool from '@balancer-labs/v2-helpers/src/models/pools/stable-phantom/StablePhantomPool';
+import StablePool from '@balancer-labs/v2-helpers/src/models/pools/stable/StablePool';
 
 import { SwapKind, WeightedPoolEncoder } from '@balancer-labs/balancer-js';
 import * as expectEvent from '@balancer-labs/v2-helpers/src/test/expectEvent';
-import { expectTransferEvent } from '@balancer-labs/v2-helpers/src/test/expectTransfer';
 import { deploy, deployedAt } from '@balancer-labs/v2-helpers/src/contract';
 import { actionId } from '@balancer-labs/v2-helpers/src/models/misc/actions';
-import { MAX_INT256, MAX_UINT256, ZERO_ADDRESS } from '@balancer-labs/v2-helpers/src/constants';
-import { BigNumberish, fp } from '@balancer-labs/v2-helpers/src/numbers';
+import { ANY_ADDRESS, MAX_INT256, MAX_UINT256, ZERO_ADDRESS } from '@balancer-labs/v2-helpers/src/constants';
+import { BigNumberish, bn, fp } from '@balancer-labs/v2-helpers/src/numbers';
 import Vault from '@balancer-labs/v2-helpers/src/models/vault/Vault';
 import { Account } from '@balancer-labs/v2-helpers/src/models/types/types';
 import TypesConverter from '@balancer-labs/v2-helpers/src/models/types/TypesConverter';
 import { Dictionary } from 'lodash';
-import {
-  expectChainedReferenceContents,
-  setChainedReferenceContents,
-  toChainedReference,
-} from './helpers/chainedReferences';
 
 describe('LidoWrapping', function () {
   let stETH: Token, wstETH: Token;
@@ -64,11 +58,21 @@ describe('LidoWrapping', function () {
         actionId(vault.instance, action)
       )
     );
-    await vault.grantPermissionsGlobally(relayerActionIds, relayer);
+    const authorizer = await deployedAt('v2-vault/Authorizer', await vault.instance.getAuthorizer());
+    const wheres = relayerActionIds.map(() => ANY_ADDRESS);
+    await authorizer.connect(admin).grantPermissions(relayerActionIds, relayer.address, wheres);
 
     // Approve relayer by sender
-    await vault.setRelayerApproval(senderUser, relayer, true);
+    await vault.instance.connect(senderUser).setRelayerApproval(senderUser.address, relayer.address, true);
   });
+
+  const CHAINED_REFERENCE_PREFIX = 'ba10';
+  function toChainedReference(key: BigNumberish): BigNumber {
+    // The full padded prefix is 66 characters long, with 64 hex characters and the 0x prefix.
+    const paddedPrefix = `0x${CHAINED_REFERENCE_PREFIX}${'0'.repeat(64 - CHAINED_REFERENCE_PREFIX.length)}`;
+
+    return BigNumber.from(paddedPrefix).add(key);
+  }
 
   function encodeApprove(token: Token, amount: BigNumberish): string {
     return relayerLibrary.interface.encodeFunctionData('approveVault', [token.address, amount]);
@@ -116,6 +120,28 @@ describe('LidoWrapping', function () {
       amount,
       outputReference ?? 0,
     ]);
+  }
+
+  async function setChainedReferenceContents(ref: BigNumberish, value: BigNumberish): Promise<void> {
+    await relayer.multicall([relayerLibrary.interface.encodeFunctionData('setChainedReferenceValue', [ref, value])]);
+  }
+
+  async function expectChainedReferenceContents(ref: BigNumberish, expectedValue: BigNumberish): Promise<void> {
+    const receipt = await (
+      await relayer.multicall([relayerLibrary.interface.encodeFunctionData('getChainedReferenceValue', [ref])])
+    ).wait();
+
+    expectEvent.inIndirectReceipt(receipt, relayerLibrary.interface, 'ChainedReferenceValueRead', {
+      value: bn(expectedValue),
+    });
+  }
+
+  function expectTransferEvent(
+    receipt: ContractReceipt,
+    args: { from?: string; to?: string; value?: BigNumberish },
+    token: Token
+  ) {
+    return expectEvent.inIndirectReceipt(receipt, token.instance.interface, 'Transfer', args, token.address);
   }
 
   describe('primitives', () => {
@@ -195,12 +221,12 @@ describe('LidoWrapping', function () {
             .connect(senderUser)
             .multicall([encodeWrap(tokenSender, tokenRecipient, amount, toChainedReference(0))]);
 
-          await expectChainedReferenceContents(relayer, toChainedReference(0), expectedWstETHAmount);
+          await expectChainedReferenceContents(toChainedReference(0), expectedWstETHAmount);
         });
 
         it('wraps with chained references', async () => {
           const expectedWstETHAmount = await wstETH.instance.getWstETHByStETH(amount);
-          await setChainedReferenceContents(relayer, toChainedReference(0), amount);
+          await setChainedReferenceContents(toChainedReference(0), amount);
 
           const receipt = await (
             await relayer
@@ -305,11 +331,11 @@ describe('LidoWrapping', function () {
             .multicall([encodeUnwrap(tokenSender, tokenRecipient, amount, toChainedReference(0))]);
 
           const stETHAmount = await wstETH.instance.getStETHByWstETH(amount);
-          await expectChainedReferenceContents(relayer, toChainedReference(0), stETHAmount);
+          await expectChainedReferenceContents(toChainedReference(0), stETHAmount);
         });
 
         it('unwraps with chained references', async () => {
-          await setChainedReferenceContents(relayer, toChainedReference(0), amount);
+          await setChainedReferenceContents(toChainedReference(0), amount);
 
           const receipt = await (
             await relayer
@@ -398,11 +424,11 @@ describe('LidoWrapping', function () {
             .connect(senderUser)
             .multicall([encodeStakeETH(tokenRecipient, amount, toChainedReference(0))], { value: amount });
 
-          await expectChainedReferenceContents(relayer, toChainedReference(0), amount);
+          await expectChainedReferenceContents(toChainedReference(0), amount);
         });
 
         it('stakes with chained references', async () => {
-          await setChainedReferenceContents(relayer, toChainedReference(0), amount);
+          await setChainedReferenceContents(toChainedReference(0), amount);
 
           const receipt = await (
             await relayer
@@ -472,13 +498,13 @@ describe('LidoWrapping', function () {
             .connect(senderUser)
             .multicall([encodeStakeETHAndWrap(tokenRecipient, amount, toChainedReference(0))], { value: amount });
 
-          await expectChainedReferenceContents(relayer, toChainedReference(0), expectedWstETHAmount);
+          await expectChainedReferenceContents(toChainedReference(0), expectedWstETHAmount);
         });
 
         it('stakes with chained references', async () => {
           const expectedWstETHAmount = await wstETH.instance.getWstETHByStETH(amount);
 
-          await setChainedReferenceContents(relayer, toChainedReference(0), amount);
+          await setChainedReferenceContents(toChainedReference(0), amount);
 
           const receipt = await (
             await relayer
@@ -507,14 +533,13 @@ describe('LidoWrapping', function () {
     let WETH: Token;
     let poolTokens: TokenList;
     let poolId: string;
-    let pool: StablePhantomPool;
-    let bptIndex: number;
+    let pool: StablePool;
 
     sharedBeforeEach('deploy pool', async () => {
       WETH = await Token.deployedAt(await vault.instance.WETH());
       poolTokens = new TokenList([WETH, wstETH]).sort();
 
-      pool = await StablePhantomPool.create({ tokens: poolTokens, vault });
+      pool = await StablePool.create({ tokens: poolTokens, vault });
       poolId = pool.poolId;
 
       await WETH.mint(senderUser, fp(2));
@@ -529,10 +554,7 @@ describe('LidoWrapping', function () {
       await wstETH.instance.connect(admin).wrap(fp(150));
       await wstETH.approve(vault, MAX_UINT256, { from: admin });
 
-      bptIndex = await pool.getBptIndex();
-      const initialBalances = Array.from({ length: 3 }).map((_, i) => (i == bptIndex ? 0 : fp(100)));
-
-      await pool.init({ initialBalances, from: admin });
+      await pool.init({ initialBalances: fp(100), from: admin });
     });
 
     describe('swap', () => {
@@ -760,7 +782,7 @@ describe('LidoWrapping', function () {
         poolId: string;
         sender: Account;
         recipient: Account;
-        assets: string[];
+        assets: TokenList;
         maxAmountsIn: BigNumberish[];
         userData: string;
         outputReference?: BigNumberish;
@@ -771,7 +793,7 @@ describe('LidoWrapping', function () {
           TypesConverter.toAddress(params.sender),
           TypesConverter.toAddress(params.recipient),
           {
-            assets: params.assets,
+            assets: params.assets.addresses,
             maxAmountsIn: params.maxAmountsIn,
             userData: params.userData,
             fromInternalBalance: false,
@@ -786,8 +808,6 @@ describe('LidoWrapping', function () {
       const amount = fp(1);
 
       sharedBeforeEach('join the pool', async () => {
-        const { tokens: allTokens } = await pool.getTokens();
-
         senderWstETHBalanceBefore = await wstETH.balanceOf(senderUser);
         receipt = await (
           await relayer.connect(senderUser).multicall([
@@ -795,10 +815,10 @@ describe('LidoWrapping', function () {
             encodeApprove(wstETH, MAX_UINT256),
             encodeJoin({
               poolId,
-              assets: allTokens,
+              assets: poolTokens,
               sender: relayer,
               recipient: recipientUser,
-              maxAmountsIn: Array(poolTokens.length + 1).fill(MAX_UINT256),
+              maxAmountsIn: poolTokens.map(() => MAX_UINT256),
               userData: WeightedPoolEncoder.joinExactTokensInForBPTOut(
                 poolTokens.map((token) => (token === wstETH ? toChainedReference(0) : 0)),
                 0
@@ -815,7 +835,11 @@ describe('LidoWrapping', function () {
         });
 
         // BPT minted to recipient
-        expectTransferEvent(receipt, { from: ZERO_ADDRESS, to: recipientUser.address }, pool);
+        expectTransferEvent(
+          receipt,
+          { from: ZERO_ADDRESS, to: recipientUser.address },
+          await Token.deployedAt(pool.address)
+        );
       });
 
       it('does not take wstETH from the user', async () => {

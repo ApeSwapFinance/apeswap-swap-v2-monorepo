@@ -18,9 +18,9 @@ pragma experimental ABIEncoderV2;
 import "./relayer/BaseRelayerLibrary.sol";
 
 import "./relayer/AaveWrapping.sol";
+import "./relayer/GaugeActions.sol";
 import "./relayer/LidoWrapping.sol";
 import "./relayer/ERC4626Wrapping.sol";
-import "./relayer/UnbuttonWrapping.sol";
 import "./relayer/VaultActions.sol";
 import "./relayer/VaultPermit.sol";
 
@@ -32,13 +32,17 @@ import "./relayer/VaultPermit.sol";
 contract BatchRelayerLibrary is
     BaseRelayerLibrary,
     AaveWrapping,
+    GaugeActions,
     LidoWrapping,
     VaultActions,
     VaultPermit,
-    ERC4626Wrapping,
-    UnbuttonWrapping
+    ERC4626Wrapping
 {
-    constructor(IVault vault, IERC20 wstETH) BaseRelayerLibrary(vault) LidoWrapping(wstETH) {
+    constructor(
+        IVault vault,
+        IBalancerMinter balancerMinter,
+        IERC20 wstETH
+    ) BaseRelayerLibrary(vault) GaugeActions(balancerMinter) LidoWrapping(wstETH) {
         // solhint-disable-previous-line no-empty-blocks
     }
 }
