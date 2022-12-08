@@ -13,7 +13,7 @@
     "node": ">=12.10"
   },
   "contributors": [
-    "DeFiFoFum <ApeSwap>",
+    "DeFiFoFum (https://github.com/DeFiFoFum)",
     "Daniel Fernandez <daniel@balancer.finance>",
     "Facu Spagnuolo <facu@balancer.finance>",
     "Fernando Martinelli <fernando@balancer.finance>",
@@ -31,6 +31,7 @@
   },
   "workspaces": [
     "pkg/*",
+    "pkg-apeswap/*",
     "pvt/*"
   ]
 }

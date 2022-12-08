@@ -1,6 +1,8 @@
+import 'dotenv/config';
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import 'hardhat-local-networks-config-plugin';
+import { HardhatUserConfig } from 'hardhat/config';
 
 import '@balancer-labs/v2-common/setupTests';
 
@@ -48,8 +50,36 @@ task(TASK_TEST)
   .addOptionalParam('blockNumber', 'Optional block number to fork in case of running fork tests.', undefined, types.int)
   .setAction(test);
 
-export default {
+const config: HardhatUserConfig = {
+  networks: {
+    dev: {
+      url: 'http://127.0.0.1:8545',
+    },
+    bsc: {
+      url: 'https://bscrpc.com',
+      // NOTE: Use for private key deployments (vanity)
+      // accounts: [''],
+      // NOTE: Use for mnemonic seed phrase deployments
+      accounts: {
+        mnemonic: process.env.MAINNET_MNEMONIC,
+      },
+    },
+    'bsc-dummy': {
+      url: 'https://bscrpc.com',
+      accounts: {
+        mnemonic: process.env.MAINNET_MNEMONIC,
+      },
+    },
+    'bsc-testnet': {
+      url: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+      accounts: {
+        mnemonic: process.env.TESTNET_MNEMONIC,
+      },
+    },
+  },
   mocha: {
     timeout: 40000,
   },
 };
+
+export default config;

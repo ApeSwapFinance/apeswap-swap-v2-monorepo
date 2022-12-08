@@ -1,13 +1,14 @@
 import Task from '../../src/task';
+import { Network } from '../../src/types';
 
 export type BatchRelayerDeployment = {
-  Vault: string;
+  Vault: Task;
   wstETH: string;
 };
 
 const Vault = new Task('20210418-vault');
 
-export default {
+const batchRelayerNetworkDeployment: Partial<Record<Network, BatchRelayerDeployment>> = {
   // wstETH is only deployed on mainnet and kovan
   mainnet: {
     Vault,
@@ -30,3 +31,5 @@ export default {
     wstETH: '0x0000000000000000000000000000000000000000',
   },
 };
+
+export default batchRelayerNetworkDeployment;

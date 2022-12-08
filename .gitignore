@@ -21,4 +21,8 @@ cache/
 # Build artifacts
 dist/
 pkg/balancer-js/src/typechain/*
+pkg-apeswap/apeswap-balancer-cli/src/web3/ABI/types/*
+
+# Env
+.env
 

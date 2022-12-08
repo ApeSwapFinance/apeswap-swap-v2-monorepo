@@ -5,6 +5,12 @@ __metadata:
   version: 4
   cacheKey: 7
 
+"@apeswapfinance/apeswap-swap-v2-monorepo@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@apeswapfinance/apeswap-swap-v2-monorepo@workspace:."
+  languageName: unknown
+  linkType: soft
+
 "@babel/code-frame@npm:7.12.11":
   version: 7.12.11
   resolution: "@babel/code-frame@npm:7.12.11"
@@ -220,6 +226,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^4.1.1
     "@typescript-eslint/parser": ^4.1.1
     chalk: ^4.1.1
+    dotenv: ^16.0.0
     eslint: ^7.9.0
     eslint-plugin-prettier: ^3.1.4
     hardhat: ^2.8.3
@@ -330,12 +337,6 @@ __metadata:
     prettier: ^2.1.2
     ts-node: ^8.10.2
     typescript: ^4.0.2
-  languageName: unknown
-  linkType: soft
-
-"@balancer-labs/v2-monorepo@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "@balancer-labs/v2-monorepo@workspace:."
   languageName: unknown
   linkType: soft
 
@@ -653,14 +654,30 @@ __metadata:
     lodash.zip: ^4.2.0
     mocha: ^8.2.1
     nodemon: ^2.0.4
-    prettier: ^2.1.2
+    prettier: ^2.5.1
     prettier-plugin-solidity: v1.0.0-alpha.59
     solhint: ^3.2.0
     solhint-plugin-prettier: ^0.0.4
-    ts-node: ^8.10.2
+    ts-node: ^10.7.0
     typescript: ^4.0.2
   languageName: unknown
   linkType: soft
+
+"@cspotcode/source-map-consumer@npm:0.8.0":
+  version: 0.8.0
+  resolution: "@cspotcode/source-map-consumer@npm:0.8.0"
+  checksum: fc32215a353c7b3d039f5d4b93329200264daeabb0739dcf53eb78f779e37e5f5c281aad281f86781c930011d354612aafab887304451a46f16b10f0f919297f
+  languageName: node
+  linkType: hard
+
+"@cspotcode/source-map-support@npm:0.7.0":
+  version: 0.7.0
+  resolution: "@cspotcode/source-map-support@npm:0.7.0"
+  dependencies:
+    "@cspotcode/source-map-consumer": 0.8.0
+  checksum: 3a0093418424729e9ab0a0f032f16946cb1cd7659bdee7d017e564189a8447eda961e5f7bed370699e94d5228f3b8cd84cb366af5fd38518b2ce833c3e138cb6
+  languageName: node
+  linkType: hard
 
 "@ensdomains/ens@npm:^0.4.4":
   version: 0.4.5
@@ -2099,6 +2116,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tsconfig/node16@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@tsconfig/node16@npm:1.0.2"
+  checksum: 57310e88858be59b36603e5d9bd7bd1714d16402ef1e536c01521ad3b207833a2fc64d260d362cae07bf4e50759a3aba3958c2faf9c42b52c4c817be60a93123
+  languageName: node
+  linkType: hard
+
 "@typechain/ethers-v5@npm:^2.0.0":
   version: 2.0.0
   resolution: "@typechain/ethers-v5@npm:2.0.0"
@@ -2571,6 +2595,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"acorn-walk@npm:^8.1.1":
+  version: 8.2.0
+  resolution: "acorn-walk@npm:8.2.0"
+  checksum: 93ffbdb8b35dda04313f1d6a94bdfdf8f929337f742e3a6d51b3026ced8471feb6a522646240809da44b0f576f4902ff2fa0c64292b3216478992aefcbde3278
+  languageName: node
+  linkType: hard
+
 "acorn@npm:^6.0.7":
   version: 6.4.2
   resolution: "acorn@npm:6.4.2"
@@ -2586,6 +2617,15 @@ __metadata:
   bin:
     acorn: bin/acorn
   checksum: 2bde98c28c1be9a08e41e581179b776b43396c9486ce52b2b9848d73c53df38c516b7edba4bacdc84cabc9d7a3299f3b46ef240ae261c38dbf8ddd89f635bd32
+  languageName: node
+  linkType: hard
+
+"acorn@npm:^8.4.1":
+  version: 8.7.0
+  resolution: "acorn@npm:8.7.0"
+  bin:
+    acorn: bin/acorn
+  checksum: d7839c37c6038e5f1b7d1aca9756d52d405a6f1287822574f98e7fada1413bd73cdb57d1e23bd3091ab00bf3b3584cf742f0b59fb77bcaf03d4875870156a801
   languageName: node
   linkType: hard
 
@@ -5173,6 +5213,13 @@ __metadata:
   dependencies:
     is-obj: ^2.0.0
   checksum: 76e6693d8803eeff9cb920988446bf223cf1f6e5b1c0c2fe07a66906392134931a481b11e3c0bd852c5cfc97fad65258bcb4359169ad1d8d624cb3f56932be98
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^16.0.0":
+  version: 16.0.0
+  resolution: "dotenv@npm:16.0.0"
+  checksum: 70186d98404e20a911623723800f7721253a3091190b8b1b65cad942e709b81e17f3c83042772de3ba598c1c05f9087c12358758a32441b83060789ab63f9a6c
   languageName: node
   linkType: hard
 
@@ -10693,6 +10740,15 @@ fsevents@~2.1.1:
   languageName: node
   linkType: hard
 
+"prettier@npm:^2.5.1":
+  version: 2.5.1
+  resolution: "prettier@npm:2.5.1"
+  bin:
+    prettier: bin-prettier.js
+  checksum: c4d3328cfd9a8dfe016485ae20dd421cd56e22d700c85916d45b9b7aa3c42a0eec6f3f6a90db6a1572f7764cfe24ee59322122fc24b37f89e351e07f183605aa
+  languageName: node
+  linkType: hard
+
 "printj@npm:~1.1.0":
   version: 1.1.2
   resolution: "printj@npm:1.1.2"
@@ -12811,6 +12867,44 @@ fsevents@~2.1.1:
   languageName: node
   linkType: hard
 
+"ts-node@npm:^10.7.0":
+  version: 10.7.0
+  resolution: "ts-node@npm:10.7.0"
+  dependencies:
+    "@cspotcode/source-map-support": 0.7.0
+    "@tsconfig/node10": ^1.0.7
+    "@tsconfig/node12": ^1.0.7
+    "@tsconfig/node14": ^1.0.0
+    "@tsconfig/node16": ^1.0.2
+    acorn: ^8.4.1
+    acorn-walk: ^8.1.1
+    arg: ^4.1.0
+    create-require: ^1.1.0
+    diff: ^4.0.1
+    make-error: ^1.1.1
+    v8-compile-cache-lib: ^3.0.0
+    yn: 3.1.1
+  peerDependencies:
+    "@swc/core": ">=1.2.50"
+    "@swc/wasm": ">=1.2.50"
+    "@types/node": "*"
+    typescript: ">=2.7"
+  peerDependenciesMeta:
+    "@swc/core":
+      optional: true
+    "@swc/wasm":
+      optional: true
+  bin:
+    ts-node: dist/bin.js
+    ts-node-cwd: dist/bin-cwd.js
+    ts-node-esm: dist/bin-esm.js
+    ts-node-script: dist/bin-script.js
+    ts-node-transpile-only: dist/bin-transpile.js
+    ts-script: dist/bin-script-deprecated.js
+  checksum: f037c1e8b53ddb86cda7f74d18f8a31197ba938b3fe2456f57089a6c0d6fc8c095bff0c03337d53635a03c4ba466b53fed2e4da48c05b7dba3764a7a2e303e76
+  languageName: node
+  linkType: hard
+
 "ts-node@npm:^8.10.2":
   version: 8.10.2
   resolution: "ts-node@npm:8.10.2"
@@ -13345,6 +13439,13 @@ typescript@^4.0.2:
   bin:
     uuid: dist/bin/uuid
   checksum: aed2bcef341f95635f308fea8831fb9038b18c485fe7e71feb89d2e05602dfecad0cb6f2246fae096d4da425cca6e8a71056f28abd97ad98cf770a2018853248
+  languageName: node
+  linkType: hard
+
+"v8-compile-cache-lib@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "v8-compile-cache-lib@npm:3.0.0"
+  checksum: 1cdd91b300865926aeb883fa1a8ecf854077e40fb69942fa7bfa24b0aea175f2b49ec5652217e8d3029e6e02a6e00dd05f2369a9dcbd3eb2ed4dad959363b0ad
   languageName: node
   linkType: hard
 

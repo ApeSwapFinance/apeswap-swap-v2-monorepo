@@ -2,7 +2,7 @@
 
 
 
-# ApeSwap Swap V2 Monorep
+# ApeSwap Swap V2 Monorepo
 [![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-yellow)](https://apeswap.gitbook.io/apeswap-finance/welcome/master)
 [![CI Status](https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo/actions/workflows/ci.yml/badge.svg)](https://github.com/ApeSwapFinance/apeswap-swap-v2-monorepo/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
